@@ -1,0 +1,14 @@
+---
+description: Performs a back of StackStorm MongoDB and Postgres databases
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/full_backup.yaml
+name: full_backup
+pack: backups
+parameters:
+  path:
+    default: /opt/stackstorm/backups
+    type: string
+  mistral_config:
+    default: /etc/mistral/mistral.conf
+    type: string

@@ -1,0 +1,49 @@
+version: '2.0'
+
+backups.full_backup:
+  description: Workflow that backs up the StackStorm MongoDB and Postgres databases
+  type: direct
+  input:
+    - path
+    - mistral_config
+    
+  output:
+    mongodb_dump_archive: <% $.mongodb_dump_archive %>
+    postgres_dump_archive: <% $.postgres_dump_archive %>
+    
+  tasks:
+    
+    date:
+      action: core.local
+      input:
+        cmd: date +%Y%m%d_%H%M%S
+      publish:
+        date: <% task(date).result.stdout %>
+      on-success:
+        - mongodb_backup
+        - postgres_backup
+
+    mongodb_backup:
+      action: backups.mongodb_backup
+      input:
+        path: <% $.path %>
+        date: <% $.date %>
+      publish:
+        mongodb_dump_archive: <% task(mongodb_backup).result.mongodb_dump_archive %>
+      on-success:
+        - end
+
+    postgres_backup:
+      action: backups.postgres_backup
+      input:
+        path: <% $.path %>
+        date: <% $.date %>
+        mistral_config: <% $.mistral_config %>
+      publish:
+        postgres_dump_archive: <% task(postgres_backup).result.postgres_dump_archive %>
+      on-success:
+        - end
+        
+    end:
+      action: std.noop
+      join: all

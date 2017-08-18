@@ -1,0 +1,16 @@
+---
+description: Performs a back of StackStorm Postgres database
+enabled: true
+runner_type: mistral-v2
+entry_point: workflows/postgres_backup.yaml
+name: postgres_backup
+pack: backups
+parameters:
+  path:
+    default: /opt/stackstorm/backups
+    type: string
+  date:
+    type: string
+  mistral_config:
+    default: /etc/mistral/mistral.conf
+    type: string
