@@ -1,24 +1,27 @@
 version: '2.0'
 
 backups.full_backup:
-  description: Workflow that backs up the StackStorm MongoDB and Postgres databases
+  description: "Workflow that backs up the StackStorm MongoDB and Postgres databases"
   type: direct
   input:
     - path
     - mistral_config
-    
+    - mongodb_admin_username
+    - mongodb_admin_password
+    - retention_days
+
   output:
-    mongodb_dump_archive: <% $.mongodb_dump_archive %>
-    postgres_dump_archive: <% $.postgres_dump_archive %>
-    
+    mongodb_dump_archive: "{{ _.mongodb_dump_archive }}"
+    postgres_dump_archive: "{{ _.postgres_dump_archive }}"
+
   tasks:
-    
+
     date:
       action: core.local
       input:
-        cmd: date +%Y%m%d_%H%M%S
+        cmd: "date +%Y%m%d_%H%M%S"
       publish:
-        date: <% task(date).result.stdout %>
+        date: "{{ task('date').result.stdout }}"
       on-success:
         - mongodb_backup
         - postgres_backup
@@ -26,24 +29,28 @@ backups.full_backup:
     mongodb_backup:
       action: backups.mongodb_backup
       input:
-        path: <% $.path %>
-        date: <% $.date %>
+        path: "{{ _.path }}"
+        date: "{{ _.date }}"
+        mongodb_admin_username: "{{ _.mongodb_admin_username }}"
+        mongodb_admin_password: "{{ _.mongodb_admin_password }}"
+        retention_days: "{{ _.retention_days }}"
       publish:
-        mongodb_dump_archive: <% task(mongodb_backup).result.mongodb_dump_archive %>
+        mongodb_dump_archive: "{{ task('mongodb_backup').result.mongodb_dump_archive }}"
       on-success:
         - end
 
     postgres_backup:
       action: backups.postgres_backup
       input:
-        path: <% $.path %>
-        date: <% $.date %>
-        mistral_config: <% $.mistral_config %>
+        path: "{{ _.path }}"
+        date: "{{ _.date }}"
+        mistral_config: "{{ _.mistral_config }}"
+        retention_days: "{{ _.retention_days }}"
       publish:
-        postgres_dump_archive: <% task(postgres_backup).result.postgres_dump_archive %>
+        postgres_dump_archive: "{{ task('postgres_backup').result.postgres_dump_archive }}"
       on-success:
         - end
-        
+
     end:
       action: std.noop
       join: all

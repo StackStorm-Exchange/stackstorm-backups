@@ -14,3 +14,7 @@ parameters:
   mistral_config:
     default: /etc/mistral/mistral.conf
     type: string
+  retention_days:
+    type: string
+    description: "Passed into the find command. Deletes files based on this value. To find files older than n days it should be +n . If you specify just n it will find files that are exactly n days old."
+    default: "{{ st2kv.system.backup.retention_days | string | default('+14', true) }}"
