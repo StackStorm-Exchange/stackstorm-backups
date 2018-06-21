@@ -1,0 +1,78 @@
+version: '2.0'
+
+backups.mongodb_backup:
+  description: "Workflow that backs up the StackStorm MongoDB database"
+  type: direct
+  input:
+    - path
+    - date
+    - mongodb_admin_username
+    - mongodb_admin_password: "{{ st2kv('system.mongodb.admin_password', decrypt=True) }}"
+    - retention_days
+    
+  output:
+    mongodb_dump_archive: "{{ _.mongodb_dump_archive }}"
+    
+  tasks:
+    
+    main:
+      action: std.noop
+      on-success:
+        - init: "{{ _.date }}"
+        - date: "{{ not _.date }}"
+
+    date:
+      action: core.local
+      input:
+        cmd: "date +%Y%m%d_%H%M%S"
+      publish:
+        date: "{{ task('date').result.stdout }}"
+      on-success:
+        - init
+
+    init:
+      action: std.noop
+      publish:
+        mongodb_dump_dirname: "mongodb_dump_{{ _.date }}"
+        mongodb_dump_archive: "{{ _.path }}/mongodb_dump_{{ _.date }}.tar.gz"
+      on-success:
+        - mkdir_path
+
+    mkdir_path:
+      action: core.local_sudo
+      input:
+        cmd: "mkdir -p '{{ _.path }}'"
+      on-success:
+        - mongodb_backup: "{{ not _.mongodb_admin_username or not _.mongodb_admin_password }}"
+        - mongodb_backup_with_auth: "{{ _.mongodb_admin_username and _.mongodb_admin_password }}"
+
+    mongodb_backup:
+      action: core.local_sudo
+      input:
+        cwd: "{{ _.path }}"
+        cmd: "mongodump -o '{{ _.mongodb_dump_dirname }}'"
+      on-success:
+        - mongodb_compress
+
+    mongodb_backup_with_auth:
+      action: core.local_sudo
+      input:
+        cwd: "{{ _.path }}"
+        cmd: "mongodump -u '{{ _.mongodb_admin_username }}' -p '{{ _.mongodb_admin_password }}' -o '{{ _.mongodb_dump_dirname }}'"
+      on-success:
+        - mongodb_compress
+
+    mongodb_compress:
+      action: core.local_sudo
+      input:
+        cwd: "{{ _.path }}"
+        cmd: "tar --remove-files -zcf {{ _.mongodb_dump_dirname }}.tar.gz {{ _.mongodb_dump_dirname }}"
+      on-success:
+        - mongodb_delete_old_files
+
+    mongodb_delete_old_files:
+      action: core.local_sudo
+      input:
+        cwd: "{{ _.path }}"
+        cmd: "find . -name 'mongodb_dump_*' -mtime {{ _.retention_days }} | xargs --no-run-if-empty rm"
+      
