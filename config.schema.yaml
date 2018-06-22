@@ -1,0 +1,6 @@
+---
+server:
+  type: string
+  description: "Name of StackStorm server"
+  required: true
+  additionalProperties: false
