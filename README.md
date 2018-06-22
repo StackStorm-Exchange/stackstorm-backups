@@ -1,6 +1,6 @@
-# backups Pack
+# Backups Pack
 
-This is a pack that backs up the MongoDB and Postgres databases in a StackStorm deployment. 
+This pack backs up the MongoDB and PostgreSQL databases in a StackStorm deployment. 
 It is currently best used on a single node deployment, but has the potential to be used
 for HA setups.
 
@@ -10,12 +10,12 @@ The `st2actionrunner` node(s) that executes the actions must have the following 
 packages installed:
 
 - `mongodb-org-tools`  (for the `mongodump` tool)
-- `postrgesql` (for the `pg_dump` tool)
+- `postgresql` (for the `pg_dump` tool)
 
 # Configuration
 
-Currently this pack's configuration is not done via config file and instead lies in
-the datastore. The following keys need to be set:
+This pack's configuration is done via the datastore, not config file.
+The following keys need to be set:
 
 | Scope  | Key | Secret | Description |
 |--------|-----|--------|-------------|
@@ -25,7 +25,7 @@ the datastore. The following keys need to be set:
 
 ## Example
 
-``` yaml
+```shell
 # save backups for 2 weeks
 st2 key set backup.retention_days "+14"
 
@@ -43,13 +43,13 @@ is built on:
 
 | Action            | Description |
 |-------------------|-------------|
-| `full_backup`     | Performs a backup of both MongoDB and Postgres databases |
-| `mongodb_backup`  | Performs a backup of the StackStorm MongoDB database     |
-| `postgres_backup` | Performs a backup of the StackStorm Postgres database    |
+| `full_backup`     | Performs a backup of both MongoDB and PostgreSQL databases |
+| `mongodb_backup`  | Performs a backup of the StackStorm MongoDB database       |
+| `postgres_backup` | Performs a backup of the StackStorm PostgreSQL database    |
 
 ## Example
 
-``` yaml
+```shell
 # perform a full backup
 st2 run backups.full_backup
 
@@ -63,12 +63,12 @@ st2 run backups.postgres_backup
 # Rules
 
 By default we do not ship with a rule to enable backups because every organization
-and deployment may need a different schedule. Instead we suggest that you create
+and deployment will have its own schedule. Instead we suggest that you create
 a rule that invokes the backup actions within a pack that your organization deploys.
 
 Here is an example rule that can be used to schedule backups on cron trigger:
 
-``` yaml
+```yaml
 ---
 name: full_backup_cron
 pack: mypack
@@ -93,7 +93,7 @@ action:
 # TODO
 
 - Allow passwords and usernames to be set via config instead of being in the key/value store
-- Allow Postgres password to be passed in via parameters
+- Allow PostgreSQL password to be passed in via parameters
 - Allow MongoDB username/password to be read in from the /etc/st2/st2.conf
 - Implement backups of remote databases (allow all credentials/configs to be passed in with parameters)
-- Investigate using Orchest or ActionChains instead of Mistral
+- Investigate using Orchestra or ActionChains instead of Mistral
