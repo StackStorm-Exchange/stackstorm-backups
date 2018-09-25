@@ -9,6 +9,7 @@ backups.mongodb_backup:
     - mongodb_admin_username
     - mongodb_admin_password: "{{ st2kv('system.mongodb.admin_password', decrypt=True) }}"
     - retention_days
+    - backup_timeout
     
   output:
     mongodb_dump_archive: "{{ _.mongodb_dump_archive }}"
@@ -51,6 +52,7 @@ backups.mongodb_backup:
       input:
         cwd: "{{ _.path }}"
         cmd: "mongodump -o '{{ _.mongodb_dump_dirname }}'"
+        timeout: "{{ _.backup_timeout }}"
       on-success:
         - mongodb_compress
 
@@ -59,6 +61,7 @@ backups.mongodb_backup:
       input:
         cwd: "{{ _.path }}"
         cmd: "mongodump -u '{{ _.mongodb_admin_username }}' -p '{{ _.mongodb_admin_password }}' -o '{{ _.mongodb_dump_dirname }}'"
+        timeout: "{{ _.backup_timeout }}"
       on-success:
         - mongodb_compress
 
@@ -67,6 +70,7 @@ backups.mongodb_backup:
       input:
         cwd: "{{ _.path }}"
         cmd: "tar --remove-files -zcf {{ _.mongodb_dump_dirname }}.tar.gz {{ _.mongodb_dump_dirname }}"
+        timeout: "{{ _.backup_timeout }}"
       on-success:
         - mongodb_delete_old_files
 
