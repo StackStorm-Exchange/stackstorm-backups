@@ -9,6 +9,7 @@ backups.full_backup:
     - mongodb_admin_username
     - mongodb_admin_password
     - retention_days
+    - backup_timeout
 
   output:
     mongodb_dump_archive: "{{ _.mongodb_dump_archive }}"
@@ -34,6 +35,7 @@ backups.full_backup:
         mongodb_admin_username: "{{ _.mongodb_admin_username }}"
         mongodb_admin_password: "{{ _.mongodb_admin_password }}"
         retention_days: "{{ _.retention_days }}"
+        backup_timeout: "{{ _.backup_timeout }}"
       publish:
         mongodb_dump_archive: "{{ task('mongodb_backup').result.mongodb_dump_archive }}"
       on-success:
@@ -46,6 +48,7 @@ backups.full_backup:
         date: "{{ _.date }}"
         mistral_config: "{{ _.mistral_config }}"
         retention_days: "{{ _.retention_days }}"
+        backup_timeout: "{{ _.backup_timeout }}"
       publish:
         postgres_dump_archive: "{{ task('postgres_backup').result.postgres_dump_archive }}"
       on-success:
