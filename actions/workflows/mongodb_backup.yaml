@@ -6,8 +6,8 @@ input:
   - date
   - mongodb_admin_username
   - mongodb_admin_password: "{{ st2kv('system.mongodb.admin_password', decrypt=True) }}"
-  - mongodump_timeout
   - retention_days
+  - backup_timeout
 
 output:
   - mongodb_dump_archive: '{{ ctx().mongodb_dump_archive }}'
@@ -60,7 +60,7 @@ tasks:
     input:
       cwd: '{{ ctx().path }}'
       cmd: "mongodump --quiet --gzip --archive='{{ ctx().mongodb_dump_archive }}'"
-      timeout: "{{ ctx().mongodump_timeout }}"
+      timeout: "{{ ctx().backup_timeout }}"
     next:
       - when: '{{ succeeded() }}'
         do:
@@ -71,7 +71,7 @@ tasks:
     input:
       cwd: '{{ ctx().path }}'
       cmd: "mongodump -u '{{ ctx().mongodb_admin_username }}' -p '{{ ctx().mongodb_admin_password }}' --quiet --gzip --archive='{{ ctx().mongodb_dump_archive }}'"
-      timeout: "{{ ctx().mongodump_timeout }}"
+      timeout: "{{ ctx().backup_timeout }}"
     next:
       - when: '{{ succeeded() }}'
         do:

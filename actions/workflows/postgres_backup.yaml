@@ -6,6 +6,7 @@ input:
   - mistral_config
   - date
   - retention_days
+  - backup_timeout
 
 output:
   - postgres_dump_archive: '{{ ctx().postgres_dump_archive }}'
@@ -57,6 +58,7 @@ tasks:
     action: core.local_sudo
     input:
       cmd: "pg_dump --compress=9 -f '{{ ctx().postgres_dump_archive }}' '{{ ctx().postgres_connection }}'"
+      timeout: "{{ ctx().backup_timeout }}"
     next:
       - when: '{{ succeeded() }}'
         do:

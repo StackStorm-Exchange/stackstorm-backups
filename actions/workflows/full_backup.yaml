@@ -7,6 +7,7 @@ input:
   - mongodb_admin_username
   - mongodb_admin_password
   - retention_days
+  - backup_timeout
 
 output:
   - mongodb_dump_archive: '{{ ctx().mongodb_dump_archive }}'
@@ -33,6 +34,7 @@ tasks:
       mongodb_admin_username: '{{ ctx().mongodb_admin_username }}'
       mongodb_admin_password: '{{ ctx().mongodb_admin_password }}'
       retention_days: '{{ ctx().retention_days }}'
+      backup_timeout: '{{ ctx().backup_timeout }}'
     next:
       - when: '{{ succeeded() or failed() }}'
         publish:
@@ -47,6 +49,7 @@ tasks:
       date: '{{ ctx().date }}'
       mistral_config: '{{ ctx().mistral_config }}'
       retention_days: '{{ ctx().retention_days }}'
+      backup_timeout: '{{ ctx().backup_timeout }}'
     next:
       - when: '{{ succeeded() or failed() }}'
         publish:
