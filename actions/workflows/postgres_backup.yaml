@@ -1,69 +1,69 @@
-version: '2.0'
+---
+version: '1.0'
+description: Workflow that backs up the StackStorm Postgres database
+input:
+  - path
+  - mistral_config
+  - date
+  - retention_days
 
-backups.postgres_backup:
-  description: "Workflow that backs up the StackStorm Postgres database"
-  type: direct
-  input:
-    - path
-    - mistral_config
-    - date
-    - retention_days
-    
-  output:
-    postgres_dump_archive: "{{ _.postgres_dump_archive }}"
-    
-  tasks:
+output:
+  - postgres_dump_archive: '{{ ctx().postgres_dump_archive }}'
 
-    main:
-      action: std.noop
-      on-success:
-        - read_connection: "{{ _.date }}"
-        - date: "{{ not _.date }}"
-    
-    date:
-      action: core.local
-      input:
-        cmd: "date +%Y%m%d_%H%M%S"
-      publish:
-        date: "{{ task('date').result.stdout }}"
-      on-success:
-        - read_connection
+tasks:
+  main:
+    action: core.noop
+    next:
+      - when: '{{ succeeded() and (ctx().date) }}'
+        do:
+          - read_connection
+      - when: '{{ succeeded() and (not ctx().date) }}'
+        do:
+          - date
 
-    read_connection:
-      action: core.local
-      input:
-        cmd: "grep -E '^connection' {{ _.mistral_config }}"
-      publish:
-        postgres_connection: "{{ task('read_connection').result.stdout.split(' ')[2] }}"
-        postgres_dump_file: "{{ _.path }}/postgres_dump_{{ _.date }}.sql"
-        postgres_dump_archive: "{{ _.path }}/postgres_dump_{{ _.date }}.sql.gz"
-      on-success:
-        - mkdir_path
+  date:
+    action: core.local
+    input:
+      cmd: "date +%Y%m%d_%H%M%S"
+    next:
+      - when: '{{ succeeded() }}'
+        publish:
+          - date: '{{ result().stdout }}'
+        do:
+          - read_connection
 
-    mkdir_path:
-      action: core.local_sudo
-      input:
-        cmd: "mkdir -p '{{ _.path }}'"
-      on-success:
-        - postgres_backup
-        
-    postgres_backup:
-      action: core.local_sudo
-      input:
-        cmd: "pg_dump -f '{{ _.postgres_dump_file }}' '{{ _.postgres_connection }}'"
-      on-success:
-        - postgres_compress
+  read_connection:
+    action: core.local
+    input:
+      cmd: "grep -E '^connection' {{ ctx().mistral_config }}"
+    next:
+      - when: '{{ succeeded() }}'
+        publish:
+          - postgres_connection: "{{ result().stdout.split(' ')[2] }}"
+          - postgres_dump_archive: '{{ ctx().path }}/postgres_dump_{{ ctx().date }}.sql.gz'
+        do:
+          - mkdir_path
 
-    postgres_compress:
-      action: core.local_sudo
-      input:
-        cmd: "gzip '{{ _.postgres_dump_file }}'"
-      on-success:
-        - postgres_delete_old_files
+  mkdir_path:
+    action: core.local_sudo
+    input:
+      cmd: "mkdir -p '{{ ctx().path }}'"
+    next:
+      - when: '{{ succeeded() }}'
+        do:
+          - postgres_backup
 
-    postgres_delete_old_files:
-      action: core.local_sudo
-      input:
-        cwd: "{{ _.path }}"
-        cmd: "find . -name 'postgres_dump_*' -mtime {{ _.retention_days }} | xargs --no-run-if-empty rm"
-    
+  postgres_backup:
+    action: core.local_sudo
+    input:
+      cmd: "pg_dump --compress=9 -f '{{ ctx().postgres_dump_archive }}' '{{ ctx().postgres_connection }}'"
+    next:
+      - when: '{{ succeeded() }}'
+        do:
+          - postgres_delete_old_files
+
+  postgres_delete_old_files:
+    action: core.local_sudo
+    input:
+      cwd: '{{ ctx().path }}'
+      cmd: "find . -name 'postgres_dump_*' -mtime {{ ctx().retention_days }} | xargs --no-run-if-empty rm"

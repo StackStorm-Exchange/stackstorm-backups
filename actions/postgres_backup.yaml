@@ -1,7 +1,7 @@
 ---
 description: Performs a back of StackStorm Postgres database
 enabled: true
-runner_type: mistral-v2
+runner_type: orquesta
 entry_point: workflows/postgres_backup.yaml
 name: postgres_backup
 pack: backups

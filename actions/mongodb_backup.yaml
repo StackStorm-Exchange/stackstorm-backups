@@ -1,7 +1,7 @@
 ---
 description: Performs a back of StackStorm MongoDB database
 enabled: true
-runner_type: mistral-v2
+runner_type: orquesta
 entry_point: workflows/mongodb_backup.yaml
 name: mongodb_backup
 pack: backups
@@ -18,6 +18,10 @@ parameters:
     default: "{% set pw = st2kv.system.mongodb.admin_password | string %}{{ pw | decrypt_kv if pw else '' }}"
     type: string
     secret: true
+  mongodump_timeout:
+    default: "{% set timeout = st2kv.system.mongodb.dump_timeout | string %}{{ (timeout | int) if timeout else 600 }}"
+    type: integer
+    description: "Timeout, in seconds, for the mongodump command"
   retention_days:
     type: string
     description: "Passed into the find command. Deletes files based on this value. To find files older than n days it should be +n . If you specify just n it will find files that are exactly n days old."
