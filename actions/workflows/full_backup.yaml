@@ -34,8 +34,7 @@ tasks:
       mongodb_admin_password: '{{ ctx().mongodb_admin_password }}'
       retention_days: '{{ ctx().retention_days }}'
     next:
-      - when: '{{ succeeded() or failed() }}'
-        publish:
+      - publish:
           - mongodb_dump_archive: '{{ result().output.mongodb_dump_archive }}'
         do:
           - end
@@ -48,8 +47,7 @@ tasks:
       mistral_config: '{{ ctx().mistral_config }}'
       retention_days: '{{ ctx().retention_days }}'
     next:
-      - when: '{{ succeeded() or failed() }}'
-        publish:
+      - publish:
           - postgres_dump_archive: '{{ result().output.postgres_dump_archive }}'
         do:
           - end
