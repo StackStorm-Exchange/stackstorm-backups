@@ -36,8 +36,7 @@ tasks:
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
     next:
-      - when: '{{ succeeded() or failed() }}'
-        publish:
+      - publish:
           - mongodb_dump_archive: '{{ result().output.mongodb_dump_archive }}'
         do:
           - end
@@ -51,8 +50,7 @@ tasks:
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
     next:
-      - when: '{{ succeeded() or failed() }}'
-        publish:
+      - publish:
           - postgres_dump_archive: '{{ result().output.postgres_dump_archive }}'
         do:
           - end
