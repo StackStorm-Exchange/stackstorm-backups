@@ -1,7 +1,7 @@
 ---
 description: Performs a back of StackStorm MongoDB database
 enabled: true
-runner_type: mistral-v2
+runner_type: orquesta
 entry_point: workflows/mongodb_backup.yaml
 name: mongodb_backup
 pack: backups
