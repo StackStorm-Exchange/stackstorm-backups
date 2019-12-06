@@ -25,5 +25,4 @@ parameters:
     default: "{{ st2kv.system.backup.retention_days | string | default('+14', true) }}"
   backup_timeout:
     type: integer
-    default: 600
-    
+    default: "{{ st2kv.system.backup.timeout | int | default(600, true) }}"

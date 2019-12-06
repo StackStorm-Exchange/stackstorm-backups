@@ -9,6 +9,10 @@ input:
   - retention_days
   - backup_timeout
 
+vars:
+  - mongo_backup_success: false
+  - postgres_backup_success: false
+
 output:
   - mongodb_dump_archive: '{{ ctx().mongodb_dump_archive }}'
   - postgres_dump_archive: '{{ ctx().postgres_dump_archive }}'
@@ -36,7 +40,9 @@ tasks:
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
     next:
-      - publish:
+      - when: "{{ succeeded() }}"
+        publish:
+          - mongo_backup_success: true
           - mongodb_dump_archive: '{{ result().output.mongodb_dump_archive }}'
         do:
           - end
@@ -50,7 +56,9 @@ tasks:
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
     next:
-      - publish:
+      - when: "{{ succeeded() }}"
+        publish:
+          - postgres_backup_success: true
           - postgres_dump_archive: '{{ result().output.postgres_dump_archive }}'
         do:
           - end
@@ -58,3 +66,10 @@ tasks:
   end:
     action: core.noop
     join: all
+    next:
+      - when: "{{ succeeded() and (ctx().mongo_backup_success and ctx().postgres_backup_success) }}"
+        do:
+          - noop
+      - when: "{{ succeeded() and (not ctx().mongo_backup_success or not ctx().postgres_backup_success) }}"
+        do:
+          - fail
