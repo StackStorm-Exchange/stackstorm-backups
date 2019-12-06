@@ -6,7 +6,7 @@
 * Fixed issue with full_backup workflow that if only 1 of the methods failed
   it would still exit successful.
 
-  Contributed by Bradley Bishop (@nmaludy Encore Technologies)
+  Contributed by Bradley Bishop (Encore Technologies)
 
 ## v1.0.0
 
