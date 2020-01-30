@@ -3,12 +3,12 @@ ref: backups
 name: backups
 description: Pack to backup StackStorm databases
 keywords:
-    - backup
-    - database
-    - postgres
-    - postgresql
-    - mongo
-    - mongodb
+  - backup
+  - database
+  - postgres
+  - postgresql
+  - mongo
+  - mongodb
 version: 1.0.1
 author: Encore Technologies
 email: code@encore.tech
