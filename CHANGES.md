@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.0.2
+
+* Fixed issue that if backups failed or timeed out then the old backups were not cleaned
+  up causing disks to fill.
+
+  Contributed by Bradley Bishop (Encore Technologies)
+
 ## v1.0.1
 
 * Added backup.timeout key value look up for backup_timeout param
