@@ -18,7 +18,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: v1-dependency-cache-py27-{{ checksum "requirements.txt" }}
+          key: v2-dependency-cache-py27-{{ checksum "requirements.txt" }}
       - run:
           name: Download dependencies
           command: |
@@ -28,7 +28,7 @@ jobs:
           name: Run tests (Python 2.7)
           command: ~/ci/.circle/test
       - save_cache:
-          key: v1-dependency-cache-py27-{{ checksum "requirements.txt" }}
+          key: v2-dependency-cache-py27-{{ checksum "requirements.txt" }}
           paths:
             - ~/.cache/pip
             - ~/.apt-cache
