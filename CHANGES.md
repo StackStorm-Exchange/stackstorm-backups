@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.0.3
+
+* Fixed issues with join task not being executed when items fail.
+
+  Contributed by Bradley Bishop (Encore Technologies)
+
 ## v1.0.2
 
 * Fixed issue that if backups failed or timeed out then the old backups were not cleaned

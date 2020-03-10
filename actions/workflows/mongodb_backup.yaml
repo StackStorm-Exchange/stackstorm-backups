@@ -10,6 +10,7 @@ input:
   - backup_timeout
 
 vars:
+  - mongodb_dump_archive: ""
   - run_success: true
 
 output:
