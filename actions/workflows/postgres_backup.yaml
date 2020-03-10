@@ -9,6 +9,7 @@ input:
   - backup_timeout
 
 vars:
+  - postgres_dump_archive: ""
   - run_success: true
 
 output:
