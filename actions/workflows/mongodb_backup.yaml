@@ -8,6 +8,7 @@ input:
   - mongodb_admin_password: "{{ st2kv('system.mongodb.admin_password', decrypt=True) }}"
   - retention_days
   - backup_timeout
+  - mongodb_host: '127.0.0.1'
 
 vars:
   - mongodb_dump_archive: ""
@@ -65,7 +66,7 @@ tasks:
     action: core.local_sudo
     input:
       cwd: '{{ ctx().path }}'
-      cmd: "mongodump --quiet --gzip --archive='{{ ctx().mongodb_dump_archive }}'"
+      cmd: "mongodump -h '{{ ctx().mongodb_host }}' --quiet --gzip --archive='{{ ctx().mongodb_dump_archive }}'"
       timeout: "{{ ctx().backup_timeout }}"
     next:
       - when: '{{ succeeded() }}'
@@ -83,7 +84,8 @@ tasks:
     action: core.local_sudo
     input:
       cwd: '{{ ctx().path }}'
-      cmd: "mongodump -u '{{ ctx().mongodb_admin_username }}' -p '{{ ctx().mongodb_admin_password }}' --quiet --gzip --archive='{{ ctx().mongodb_dump_archive }}'"
+      cmd: "mongodump -u '{{ ctx().mongodb_admin_username }}' -p '{{ ctx().mongodb_admin_password}}' -h '{{ ctx().mongodb_host }}' --quiet --gzip --archive='{{ ctx()
+       .mongodb_dump_archive }}'"
       timeout: "{{ ctx().backup_timeout }}"
     next:
       - when: '{{ succeeded() }}'
