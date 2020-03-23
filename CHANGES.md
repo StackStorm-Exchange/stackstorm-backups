@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.0.4
+
+* Added mongodb_host option to backup remote MongoDB database. Defaults to '127.0.0.1'
+
 ## v1.0.3
 
 * Fixed issues with join task not being executed when items fail.
