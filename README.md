@@ -22,7 +22,7 @@ The following keys need to be set:
 | system | backup.retention_days  | false | Passed into the `find` command, deletes files based on this many days. To find files older than n days you should specify `+n` . If you specify just `n` it will find files that are exactly `n` days old. |
 | system | mongodb.admin_password | true  | Password of the `admin` user for MongoDB |
 | system | mongodb.admin_username | false | Username of the `admin` user for MongoDB |
-| system | mongodb.mongo_host     | false | Hostname of the MongDB system to backup |
+| system | mongodb.mongodb_host     | false | Hostname of the MongDB system to backup |
 
 ## Example
 
@@ -35,6 +35,9 @@ st2 key set mongodb.admin_username "admin"
 
 # set our mongodb password
 st2 key set -e mongodb.admin_password "Secret!"
+
+# set our mongodb host
+st2 key set -e mongodb.mongodb_host server01"
 ```
 
 # Actions
@@ -96,5 +99,6 @@ action:
 - Allow passwords and usernames to be set via config instead of being in the key/value store
 - Allow PostgreSQL password to be passed in via parameters
 - Allow MongoDB username/password to be read in from the /etc/st2/st2.conf
-- Implement backups of remote databases (allow all credentials/configs to be passed in with parameters)
+- Implement backups of PostgreSQL database (allow all credentials/configs to be passed in with
+ parameters)
 - Investigate using Orchestra or ActionChains instead of Mistral
