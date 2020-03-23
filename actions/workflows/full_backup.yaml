@@ -38,9 +38,10 @@ tasks:
       date: '{{ ctx().date }}'
       mongodb_admin_username: '{{ ctx().mongodb_admin_username }}'
       mongodb_admin_password: '{{ ctx().mongodb_admin_password }}'
+      mongodb_host: '{{ ctx().mongodb_host }}'
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
-      host: '{{ ctx().mongodb_host }}'
+
     next:
       - when: "{{ completed() }}"
         publish:
