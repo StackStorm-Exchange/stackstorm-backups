@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.0.5
+
+* Forced release to included hotfix for `backups.full_backup`
+
 ## v1.0.4
 
 * Added mongodb_host option to backup remote MongoDB database. Defaults to '127.0.0.1'
