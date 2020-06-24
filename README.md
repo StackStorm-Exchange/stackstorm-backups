@@ -37,7 +37,7 @@ st2 key set mongodb.admin_username "admin"
 st2 key set -e mongodb.admin_password "Secret!"
 
 # set our mongodb host
-st2 key set mongodb.mongodb_host server01"
+st2 key set mongodb.mongodb_host "server01"
 ```
 
 # Actions
