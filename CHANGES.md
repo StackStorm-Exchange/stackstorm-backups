@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.1.0
+
+* Removed the `backups.postgres_backup` action (Mistral is being removed from StackStorm). 
+* The `backups.full_backup` action now only backs up the MongoDB database.
+
+  Contributed by Nick Maludy (@nmaludy Encore Technologies)
+  
 ## v1.0.4
 
 * Added mongodb_host option to backup remote MongoDB database. Defaults to '127.0.0.1'

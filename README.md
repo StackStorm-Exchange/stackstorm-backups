@@ -1,6 +1,6 @@
 # Backups Pack
 
-This pack backs up the MongoDB and PostgreSQL databases in a StackStorm deployment. 
+This pack backs up the MongoDB database in a StackStorm deployment. 
 It is currently best used on a single node deployment, but has the potential to be used
 for HA setups.
 
@@ -10,7 +10,6 @@ The `st2actionrunner` node(s) that executes the actions must have the following 
 packages installed:
 
 - `mongodb-org-tools`  (for the `mongodump` tool)
-- `postgresql` (for the `pg_dump` tool)
 
 # Configuration
 
@@ -47,9 +46,8 @@ is built on:
 
 | Action            | Description |
 |-------------------|-------------|
-| `full_backup`     | Performs a backup of both MongoDB and PostgreSQL databases |
+| `full_backup`     | Performs a backup of the MongoDB database |
 | `mongodb_backup`  | Performs a backup of the StackStorm MongoDB database       |
-| `postgres_backup` | Performs a backup of the StackStorm PostgreSQL database    |
 
 ## Example
 
@@ -59,9 +57,6 @@ st2 run backups.full_backup
 
 # perform backup of mongodb
 st2 run backups.mongodb_backup
-
-# perform backup of postgres
-st2 run backups.postgres_backup
 ```
 
 # Rules
@@ -97,8 +92,5 @@ action:
 # TODO
 
 - Allow passwords and usernames to be set via config instead of being in the key/value store
-- Allow PostgreSQL password to be passed in via parameters
 - Allow MongoDB username/password to be read in from the /etc/st2/st2.conf
-- Implement backups of PostgreSQL database (allow all credentials/configs to be passed in with
- parameters)
-- Investigate using Orchestra or ActionChains instead of Mistral
+- Backup "content" in /opt/stackstorm/packs, /opt/stackstorm/virtualenvs, configs, etc
