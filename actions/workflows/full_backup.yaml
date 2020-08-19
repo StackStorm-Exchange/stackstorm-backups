@@ -1,9 +1,8 @@
 ---
 version: '1.0'
-description: Workflow that backs up the StackStorm MongoDB and Postgres databases
+description: Workflow that backs up the StackStorm MongoDB database
 input:
   - path
-  - mistral_config
   - mongodb_admin_username
   - mongodb_admin_password
   - retention_days
@@ -12,11 +11,9 @@ input:
 
 vars:
   - mongo_backup_success: false
-  - postgres_backup_success: false
 
 output:
   - mongodb_dump_archive: '{{ ctx().mongodb_dump_archive }}'
-  - postgres_dump_archive: '{{ ctx().postgres_dump_archive }}'
 
 tasks:
   date:
@@ -29,7 +26,6 @@ tasks:
           - date: '{{ result().stdout }}'
         do:
           - mongodb_backup
-          - postgres_backup
 
   mongodb_backup:
     action: backups.mongodb_backup
@@ -41,38 +37,16 @@ tasks:
       mongodb_host: '{{ ctx().mongodb_host }}'
       retention_days: '{{ ctx().retention_days }}'
       backup_timeout: '{{ ctx().backup_timeout }}'
-
     next:
-      - when: "{{ completed() }}"
+      - when: "{{ succeeded() }}"
         publish:
-          - mongo_backup_success: "{{ true if succeeded() else false }}"
+          - mongo_backup_success: "{{ true }}"
           - mongodb_dump_archive: '{{ result().output.mongodb_dump_archive }}'
         do:
-          - end
-
-  postgres_backup:
-    action: backups.postgres_backup
-    input:
-      path: '{{ ctx().path }}'
-      date: '{{ ctx().date }}'
-      mistral_config: '{{ ctx().mistral_config }}'
-      retention_days: '{{ ctx().retention_days }}'
-      backup_timeout: '{{ ctx().backup_timeout }}'
-    next:
-      - when: "{{ completed() }}"
-        publish:
-          - postgres_backup_success: "{{ true if succeeded() else false }}"
-          - postgres_dump_archive: '{{ result().output.postgres_dump_archive }}'
-        do:
-          - end
-
-  end:
-    action: core.noop
-    join: all
-    next:
-      - when: "{{ succeeded() and (ctx().mongo_backup_success and ctx().postgres_backup_success) }}"
-        do:
           - noop
-      - when: "{{ succeeded() and (not ctx().mongo_backup_success or not ctx().postgres_backup_success) }}"
+      - when: "{{ failed() }}"
+        publish:
+          - mongo_backup_success: "{{ false }}"
+          - mongodb_dump_archive: '{{ result().output.mongodb_dump_archive }}'
         do:
           - fail

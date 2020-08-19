@@ -9,9 +9,6 @@ parameters:
   path:
     default: /opt/stackstorm/backups
     type: string
-  mistral_config:
-    default: /etc/mistral/mistral.conf
-    type: string
   mongodb_admin_username:
     default: "{{ st2kv.system.mongodb.admin_username }}"
     type: string
