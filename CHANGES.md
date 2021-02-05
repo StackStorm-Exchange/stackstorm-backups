@@ -1,5 +1,9 @@
 # Change Log
 
+## v2.0.0
+
+* Drop Python 2.7 support
+
 ## v1.0.5
 
 * Forced release to included hotfix for `backups.full_backup`
